@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patriot Pitmasters - BBQ Competition Timer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --navy: #0a1628;
+            --navy-light: #1a2a4a;
+            --red: #b22234;
+            --red-bright: #dc143c;
+            --white: #ffffff;
+            --white-soft: #f0f0f0;
+            --blue: #002868;
+            --blue-light: #3c5a99;
+            --gold: #ffd700;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--navy) 0%, #000000 100%);
+            color: var(--white);
+            min-height: 100vh;
+            padding: 20px;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(178, 34, 52, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 40, 104, 0.2) 0%, transparent 50%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px 20px;
+            background: linear-gradient(180deg, rgba(178, 34, 52, 0.2) 0%, rgba(10, 22, 40, 0.8) 100%);
+            border-radius: 15px;
+            border: 3px solid var(--white);
+            box-shadow: 0 0 30px rgba(178, 34, 52, 0.4), inset 0 0 60px rgba(0, 40, 104, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--red) 33%, var(--white) 33%, var(--white) 66%, var(--blue) 66%);
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            font-weight: 900;
+            color: var(--white);
+            text-shadow: 
+                3px 3px 0 var(--red),
+                6px 6px 0 var(--blue),
+                0 0 20px rgba(255, 255, 255, 0.5);
+            font-family: 'Arial Black', sans-serif;
+        }
+
+        .competition-info {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .info-box {
+            background: rgba(0, 40, 104, 0.6);
+            border: 2px solid var(--white);
+            border-radius: 10px;
+            padding: 15px 25px;
+            min-width: 200px;
+        }
+
+        .info-label {
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+            color: var(--white-soft);
+        }
+
+        .current-time {
+            font-size: 2.5em;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        .start-time-display {
+            font-size: 1.2em;
+            color: var(--white);
+            font-weight: bold;
+        }
+
+        .controls {
+            background: rgba(0, 40, 104, 0.4);
+            border: 2px solid var(--red);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            backdrop-filter: blur(10px);
+        }
+
+        .competition-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        select, input {
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: 2px solid var(--white);
+            background: var(--navy);
+            color: var(--white);
+            font-size: 16px;
+            outline: none;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: 2px solid transparent;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 14px;
+            background: var(--red);
+            color: var(--white);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(178, 34, 52, 0.4);
+            background: var(--red-bright);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: var(--blue);
+            border-color: var(--white);
+        }
+
+        .btn-secondary:hover {
+            background: var(--blue-light);
+        }
+
+        .btn-gold {
+            background: var(--gold);
+            color: var(--navy);
+            border-color: var(--gold);
+        }
+
+        .btn-gold:hover {
+            background: #ffed4e;
+            box-shadow: 0 6px 12px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-danger {
+            background: #8B0000;
+        }
+
+        .btn-danger:hover {
+            background: #a50000;
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 12px;
+        }
+
+        .master-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            padding: 10px;
+            background: rgba(178, 34, 52, 0.2);
+            border-radius: 8px;
+            border: 1px solid var(--red);
+        }
+
+        .timers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .timer-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(240,240,240,0.9) 100%);
+            border-radius: 15px;
+            padding: 25px;
+            border: 3px solid;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            color: var(--navy);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .timer-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .timer-card.critical {
+            animation: pulse 1s infinite;
+            box-shadow: 0 0 30px var(--red);
+            border-color: var(--red);
+        }
+
+        .timer-card.warning {
+            border-color: var(--gold);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 30px var(--red); }
+            50% { transform: scale(1.02); box-shadow: 0 0 50px var(--red-bright); }
+        }
+
+        .timer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            border-bottom: 2px solid rgba(10, 22, 40, 0.1);
+            padding-bottom: 10px;
+        }
+
+        .timer-name {
+            font-size: 1.4em;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--navy);
+        }
+
+        .timer-category {
+            font-size: 0.9em;
+            color: var(--blue);
+            margin-top: 5px;
+            font-weight: 600;
+        }
+
+        .countdown {
+            font-size: 2.8em;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            color: var(--navy);
+            text-shadow: none;
+            letter-spacing: 2px;
+        }
+
+        .countdown.expired {
+            color: var(--red);
+        }
+
+        .countdown.critical {
+            color: var(--red-bright);
+        }
+
+        .target-time {
+            text-align: center;
+            font-size: 1em;
+            color: var(--blue);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .alarm-setting {
+            text-align: center;
+            font-size: 0.85em;
+            color: var(--red);
+            margin-bottom: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .timer-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .timer-actions button {
+            font-size: 12px;
+            padding: 8px 15px;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 22, 40, 0.95);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal {
+            background: linear-gradient(180deg, var(--white) 0%, var(--white-soft) 100%);
+            border: 4px solid var(--red);
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 0 40px rgba(178, 34, 52, 0.5);
+            color: var(--navy);
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            color: var(--red);
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 1.5em;
+            border-bottom: 3px solid var(--blue);
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.9em;
+            letter-spacing: 1px;
+            color: var(--navy);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--blue);
+            border-radius: 5px;
+            background: var(--white);
+            color: var(--navy);
+            font-size: 16px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .radio-option input[type="radio"] {
+            width: auto;
+            accent-color: var(--red);
+            width: 20px;
+            height: 20px;
+        }
+
+        .time-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 25px;
+        }
+
+        .color-picker {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: transform 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .color-option:hover {
+            transform: scale(1.2);
+        }
+
+        .color-option.selected {
+            border-color: var(--navy);
+            box-shadow: 0 0 0 3px var(--gold), 0 0 10px rgba(0,0,0,0.5);
+            transform: scale(1.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            opacity: 0.8;
+            color: var(--white);
+            grid-column: 1 / -1;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: var(--gold);
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: bold;
+            text-transform: uppercase;
+            background: var(--red);
+            color: var(--white);
+            border: 2px solid var(--white);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .status-badge.active {
+            background: var(--blue);
+        }
+
+        .status-badge.warning {
+            background: var(--gold);
+            color: var(--navy);
+        }
+
+        .move-btn {
+            background: rgba(0, 40, 104, 0.1);
+            border: 1px solid var(--blue);
+            color: var(--blue);
+            padding: 4px 8px;
+            font-size: 10px;
+            min-width: 30px;
+            box-shadow: none;
+        }
+
+        .move-btn:hover {
+            background: var(--blue);
+            color: var(--white);
+        }
+
+        .reorder-controls {
+            display: flex;
+            gap: 5px;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            color: var(--navy);
+            font-weight: 600;
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--red);
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2em; letter-spacing: 2px; }
+            .current-time { font-size: 1.8em; }
+            .countdown { font-size: 2em; }
+            .competition-info { gap: 20px; }
+            .info-box { min-width: 150px; padding: 10px 15px; }
+            .timers-grid { grid-template-columns: 1fr; }
+            .controls { flex-direction: column; align-items: stretch; }
+            .master-controls { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🇺🇸 PATRIOT PITMASTERS 🇺🇸</h1>
+            <div class="competition-info">
+                <div class="info-box">
+                    <div class="info-label">Current Time</div>
+                    <div class="current-time" id="currentTime">--:--:--</div>
+                </div>
+                <div class="info-box" id="startTimeBox" style="display: none;">
+                    <div class="info-label">Competition Start</div>
+                    <div class="start-time-display" id="compStartDisplay">--:--</div>
+                    <div id="elapsedTime" style="font-size: 0.9em; color: var(--gold); margin-top: 5px;">Elapsed: --:--</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="controls">
+            <div class="competition-selector">
+                <select id="competitionSelect" onchange="loadCompetition()">
+                    <option value="">Select Competition...</option>
+                </select>
+                <button class="btn-secondary btn-small" onclick="newCompetition()">New Comp</button>
+                <button class="btn-secondary btn-small" onclick="editCompetition()">Edit Start</button>
+                <button class="btn-gold btn-small" onclick="startCompetitionNow()" id="startNowBtn" style="display: none;">START NOW</button>
+                <button class="btn-danger btn-small" onclick="deleteCompetition()">Delete</button>
+            </div>
+            
+            <div class="master-controls">
+                <button class="btn-gold" onclick="exportData()">Export</button>
+                <button class="btn-secondary btn-small" onclick="importData()">Import</button>
+                <label class="checkbox-wrapper">
+                    <input type="checkbox" id="soundEnabled" class="checkbox">
+                    <span>🔊 Sound</span>
+                </label>
+                <button class="btn-gold" onclick="openAddTimer()">+ Add Timer</button>
+            </div>
+        </div>
+
+        <div class="timers-grid" id="timersContainer">
+            <div class="empty-state">
+                <h3>No Competition Selected</h3>
+                <p>Create a new competition and set your start time to get rolling</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="timerModal">
+        <div class="modal">
+            <h2 id="modalTitle">Add Turn-in Timer</h2>
+            <form id="timerForm" onsubmit="saveTimer(event)">
+                <input type="hidden" id="editTimerId">
+                
+                <div class="form-group">
+                    <label>Category Name</label>
+                    <input type="text" id="timerName" placeholder="e.g., CHICKEN, BRISKET, PORK RIBS" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Timer Type</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="timerType" value="absolute" checked onchange="toggleTimerType()">
+                            Specific Clock Time
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="timerType" value="relative" onchange="toggleTimerType()">
+                            Hours After Start
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group" id="absoluteTimeGroup">
+                    <label>Turn-in Time (Clock)</label>
+                    <input type="datetime-local" id="timerTarget">
+                </div>
+
+                <div class="form-group" id="relativeTimeGroup" style="display: none;">
+                    <label>Time After Competition Start</label>
+                    <div class="time-inputs">
+                        <div>
+                            <label style="font-size: 0.8em; font-weight: normal;">Hours</label>
+                            <input type="number" id="offsetHours" min="0" max="24" value="6" placeholder="6">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.8em; font-weight: normal;">Minutes</label>
+                            <input type="number" id="offsetMinutes" min="0" max="59" value="0" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Alarm Minutes Before (Warning)</label>
+                    <input type="number" id="alarmMinutes" min="1" max="120" value="15" required>
+                    <small style="color: var(--blue); font-size: 0.85em;">You'll get an alert this many minutes before turn-in</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Color Code</label>
+                    <div class="color-picker" id="colorPicker">
+                        <div class="color-option selected" style="background: #b22234" data-color="#b22234"></div>
+                        <div class="color-option" style="background: #002868" data-color="#002868"></div>
+                        <div class="color-option" style="background: #ffffff; border: 2px solid #ccc;" data-color="#ffffff"></div>
+                        <div class="color-option" style="background: #000080" data-color="#000080"></div>
+                        <div class="color-option" style="background: #FFD700" data-color="#FFD700"></div>
+                        <div class="color-option" style="background: #28A745" data-color="#28A745"></div>
+                        <div class="color-option" style="background: #DC143C" data-color="#DC143C"></div>
+                        <div class="color-option" style="background: #FF6B35" data-color="#FF6B35"></div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal()" style="background: #666;">Cancel</button>
+                    <button type="submit" class="btn-gold">Save Timer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="compModal">
+        <div class="modal">
+            <h2 id="compModalTitle">New Competition</h2>
+            <form onsubmit="saveCompetition(event)">
+                <div class="form-group">
+                    <label>Competition Name</label>
+                    <input type="text" id="compName" placeholder="e.g., KCBS Nationals 2026" required>
+                </div>
+                <div class="form-group">
+                    <label>Competition Start Time (Optional)</label>
+                    <input type="datetime-local" id="compStartTime">
+                    <small style="color: var(--blue); font-size: 0.85em; display: block; margin-top: 5px;">
+                        This sets when your "Day 0" begins. All "Hours After Start" timers will calculate from this time.
+                    </small>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeCompModal()" style="background: #666;">Cancel</button>
+                    <button type="submit" class="btn-gold">Create Competition</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="importModal">
+        <div class="modal">
+            <h2>Import Data</h2>
+            <form onsubmit="processImport(event)">
+                <div class="form-group">
+                    <label>Paste JSON Data</label>
+                    <textarea id="importData" rows="6" style="width: 100%; background: rgba(0,0,0,0.05); color: var(--navy); border: 2px solid var(--blue); border-radius: 5px; padding: 12px; font-family: monospace;" placeholder='{"Competition Name": {"startTime": "...", "timers": [...]}}'></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeImportModal()" style="background: #666;">Cancel</button>
+                    <button type="submit" class="btn-gold">Import</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let competitions = JSON.parse(localStorage.getItem('bbqCompetitions')) || {};
+        let currentComp = localStorage.getItem('currentComp') || '';
+        let selectedColor = '#b22234';
+        let audioContext = null;
+        let alertTriggered = {};
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateClock();
+            setInterval(updateClock, 1000);
+            setInterval(updateTimers, 1000);
+            populateCompetitionSelect();
+            
+            if (currentComp && competitions[currentComp]) {
+                document.getElementById('competitionSelect').value = currentComp;
+                updateStartNowButton();
+                updateCompetitionDisplay();
+                renderTimers();
+            }
+
+            document.querySelectorAll('.color-option').forEach(opt => {
+                opt.addEventListener('click', () => {
+                    document.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
+                    opt.classList.add('selected');
+                    selectedColor = opt.dataset.color;
+                });
+            });
+
+            document.body.addEventListener('click', initAudio, { once: true });
+        });
+
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }
+
+        function playAlert() {
+            if (!document.getElementById('soundEnabled').checked) return;
+            
+            try {
+                if (!audioContext) initAudio();
+                
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.3);
+                oscillator.type = 'square';
+                
+                gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+
+                setTimeout(() => {
+                    const osc2 = audioContext.createOscillator();
+                    const gain2 = audioContext.createGain();
+                    osc2.connect(gain2);
+                    gain2.connect(audioContext.destination);
+                    osc2.frequency.setValueAtTime(600, audioContext.currentTime);
+                    osc2.type = 'square';
+                    gain2.gain.setValueAtTime(0.2, audioContext.currentTime);
+                    gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                    osc2.start();
+                    osc2.stop(audioContext.currentTime + 0.5);
+                }, 200);
+            } catch (e) {
+                console.error('Audio play failed:', e);
+            }
+        }
+
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString('en-US', { 
+                hour12: false, 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            });
+            
+            if (currentComp && competitions[currentComp] && competitions[currentComp].startTime) {
+                const start = new Date(competitions[currentComp].startTime);
+                const diff = now - start;
+                if (diff > 0) {
+                    const hours = Math.floor(diff / 3600000);
+                    const minutes = Math.floor((diff % 3600000) / 60000);
+                    document.getElementById('elapsedTime').textContent = 
+                        `Elapsed: ${hours}h ${minutes}m`;
+                } else {
+                    const hours = Math.floor(Math.abs(diff) / 3600000);
+                    const minutes = Math.floor((Math.abs(diff) % 3600000) / 60000);
+                    document.getElementById('elapsedTime').textContent = 
+                        `Starts in: ${hours}h ${minutes}m`;
+                }
+            }
+        }
+
+        function getEffectiveTarget(timer) {
+            if (timer.offsetMinutes !== undefined && competitions[currentComp] && competitions[currentComp].startTime) {
+                const start = new Date(competitions[currentComp].startTime);
+                return new Date(start.getTime() + (timer.offsetMinutes * 60000));
+            }
+            return new Date(timer.target);
+        }
+
+        function updateCompetitionDisplay() {
+            const comp = competitions[currentComp];
+            if (comp && comp.startTime) {
+                const start = new Date(comp.startTime);
+                document.getElementById('startTimeBox').style.display = 'block';
+                document.getElementById('compStartDisplay').textContent = 
+                    start.toLocaleTimeString('en-US', { 
+                        hour: 'numeric', 
+                        minute: '2-digit',
+                        hour12: true 
+                    }) + ' ' + start.toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
+                document.getElementById('startNowBtn').style.display = 'none';
+            } else {
+                document.getElementById('startTimeBox').style.display = 'none';
+                if (currentComp) {
+                    document.getElementById('startNowBtn').style.display = 'inline-block';
+                } else {
+                    document.getElementById('startNowBtn').style.display = 'none';
+                }
+            }
+        }
+
+        function updateStartNowButton() {
+            const comp = competitions[currentComp];
+            if (currentComp && (!comp || !comp.startTime)) {
+                document.getElementById('startNowBtn').style.display = 'inline-block';
+            } else {
+                document.getElementById('startNowBtn').style.display = 'none';
+            }
+        }
+
+        function populateCompetitionSelect() {
+            const select = document.getElementById('competitionSelect');
+            select.innerHTML = '<option value="">Select Competition...</option>';
+            
+            Object.keys(competitions).sort().forEach(name => {
+                const option = document.createElement('option');
+                option.value = name;
+                option.textContent = name;
+                select.appendChild(option);
+            });
+        }
+
+        function loadCompetition() {
+            currentComp = document.getElementById('competitionSelect').value;
+            localStorage.setItem('currentComp', currentComp);
+            alertTriggered = {};
+            updateStartNowButton();
+            updateCompetitionDisplay();
+            renderTimers();
+        }
+
+        function startCompetitionNow() {
+            if (!currentComp) return;
+            const now = new Date();
+            if (!competitions[currentComp]) return;
+            
+            competitions[currentComp].startTime = now.toISOString();
+            saveData();
+            updateStartNowButton();
+            updateCompetitionDisplay();
+            renderTimers();
+            
+            const timeStr = now.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true});
+            alert(`Competition started at ${timeStr}! All relative timers are now counting down from this time.`);
+        }
+
+        function newCompetition() {
+            document.getElementById('compModalTitle').textContent = 'New Competition';
+            document.getElementById('compModal').querySelector('form').onsubmit = saveCompetition;
+            document.getElementById('compModal').style.display = 'flex';
+            document.getElementById('compName').value = '';
+            document.getElementById('compName').disabled = false;
+            document.getElementById('compStartTime').value = '';
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('compStartTime').value = now.toISOString().slice(0, 16);
+        }
+
+        function editCompetition() {
+            if (!currentComp || !competitions[currentComp]) {
+                alert('Select a competition first');
+                return;
+            }
+            const comp = competitions[currentComp];
+            document.getElementById('compModalTitle').textContent = 'Edit Competition Start';
+            document.getElementById('compName').value = currentComp;
+            document.getElementById('compName').disabled = true;
+            document.getElementById('compStartTime').value = comp.startTime ? 
+                toLocalDateTimeInput(comp.startTime) : '';
+            document.getElementById('compModal').querySelector('form').onsubmit = updateCompetitionStart;
+            document.getElementById('compModal').style.display = 'flex';
+        }
+
+        function closeCompModal() {
+            document.getElementById('compModal').style.display = 'none';
+            document.getElementById('compName').disabled = false;
+        }
+
+        function saveCompetition(e) {
+            e.preventDefault();
+            const name = document.getElementById('compName').value.trim();
+            const startTime = document.getElementById('compStartTime').value;
+            
+            if (!name) {
+                alert('Please enter a competition name');
+                return;
+            }
+            
+            if (competitions[name]) {
+                alert('A competition with this name already exists');
+                return;
+            }
+            
+            competitions[name] = {
+                timers: [],
+                startTime: startTime || null,
+                created: new Date().toISOString()
+            };
+            saveData();
+            populateCompetitionSelect();
+            document.getElementById('competitionSelect').value = name;
+            loadCompetition();
+            closeCompModal();
+        }
+
+        function updateCompetitionStart(e) {
+            e.preventDefault();
+            const startTime = document.getElementById('compStartTime').value;
+            competitions[currentComp].startTime = startTime || null;
+            saveData();
+            updateCompetitionDisplay();
+            renderTimers();
+            closeCompModal();
+        }
+
+        function deleteCompetition() {
+            if (!currentComp) {
+                alert('Please select a competition to delete');
+                return;
+            }
+            if (!confirm(`Delete "${currentComp}" and all its timers?`)) return;
+            
+            delete competitions[currentComp];
+            currentComp = '';
+            localStorage.setItem('currentComp', '');
+            saveData();
+            populateCompetitionSelect();
+            document.getElementById('competitionSelect').value = '';
+            alertTriggered = {};
+            updateStartNowButton();
+            updateCompetitionDisplay();
+            renderTimers();
+        }
+
+        function saveData() {
+            localStorage.setItem('bbqCompetitions', JSON.stringify(competitions));
+        }
+
+        function toLocalDateTimeInput(isoString) {
+            const date = new Date(isoString);
+            const pad = (n) => n.toString().padStart(2, '0');
+            return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+        }
+
+        function toggleTimerType() {
+            const type = document.querySelector('input[name="timerType"]:checked').value;
+            document.getElementById('absoluteTimeGroup').style.display = 
+                type === 'absolute' ? 'block' : 'none';
+            document.getElementById('relativeTimeGroup').style.display = 
+                type === 'relative' ? 'block' : 'none';
+            
+            if (type === 'absolute') {
+                const now = new Date();
+                now.setHours(12, 0, 0, 0);
+                document.getElementById('timerTarget').value = toLocalDateTimeInput(now.toISOString());
+            }
+        }
+
+        function renderTimers() {
+            const container = document.getElementById('timersContainer');
+            
+            if (!currentComp || !competitions[currentComp]) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No Competition Selected</h3>
+                        <p>Create a new competition and set your start time to get rolling</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const timers = competitions[currentComp].timers || [];
+            
+            if (timers.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No Timers Yet</h3>
+                        <p>Add your first turn-in timer to get started</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = timers.map((timer, index) => createTimerCard(timer, index)).join('');
+        }
+
+        function createTimerCard(timer, index) {
+            const now = new Date();
+            const target = getEffectiveTarget(timer);
+            const diff = target - now;
+            const isExpired = diff <= 0;
+            const alarmMs = (timer.alarmMinutes || 15) * 60000;
+            const isCritical = diff > 0 && diff <= alarmMs;
+            const isWarning = diff > alarmMs && diff <= (alarmMs * 2);
+            const timerId = `${currentComp}_${index}`;
+            
+            if (isCritical && !alertTriggered[timerId]) {
+                alertTriggered[timerId] = true;
+                playAlert();
+            } else if (!isCritical) {
+                alertTriggered[timerId] = false;
+            }
+            
+            let timeDisplay;
+            let statusClass = '';
+            let statusText = '';
+            let countdownClass = '';
+            
+            if (isExpired) {
+                timeDisplay = '00:00:00';
+                statusText = 'TURNED IN';
+                statusClass = '';
+                countdownClass = 'expired';
+            } else {
+                const hours = Math.floor(diff / 3600000);
+                const minutes = Math.floor((diff % 3600000) / 60000);
+                const seconds = Math.floor((diff % 60000) / 1000);
+                timeDisplay = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                
+                if (isCritical) {
+                    statusText = 'ALERT';
+                    statusClass = 'critical';
+                    countdownClass = 'critical';
+                } else if (isWarning) {
+                    statusText = 'WARNING';
+                    statusClass = 'warning';
+                    countdownClass = '';
+                } else {
+                    statusText = 'ACTIVE';
+                    statusClass = 'active';
+                    countdownClass = '';
+                }
+            }
+
+            const targetStr = target.toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit',
+                hour12: true 
+            });
+            const targetDate = target.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric' 
+            });
+
+            const alarmText = timer.alarmMinutes ? `${timer.alarmMinutes} min alert` : '15 min alert';
+
+            return `
+                <div class="timer-card ${statusClass}" style="border-color: ${timer.color || '#b22234'};">
+                    ${statusText ? `<span class="status-badge ${statusClass}">${statusText}</span>` : ''}
+                    <div class="timer-header">
+                        <div>
+                            <div class="timer-name" style="color: ${timer.color === '#ffffff' ? '#0a1628' : (timer.color || '#b22234')}">${escapeHtml(timer.name)}</div>
+                            <div class="timer-category">${targetDate} at ${targetStr}</div>
+                        </div>
+                        <div class="reorder-controls">
+                            <button class="move-btn" onclick="moveTimer(${index}, -1)" ${index === 0 ? 'disabled' : ''}>▲</button>
+                            <button class="move-btn" onclick="moveTimer(${index}, 1)" ${index === competitions[currentComp].timers.length - 1 ? 'disabled' : ''}>▼</button>
+                        </div>
+                    </div>
+                    <div class="countdown ${countdownClass}" style="color: ${timer.color === '#ffffff' ? '#0a1628' : (timer.color || '#b22234')}">${timeDisplay}</div>
+                    <div class="alarm-setting">⏰ ${escapeHtml(alarmText)}</div>
+                    <div class="timer-actions">
+                        <button class="btn-secondary btn-small" onclick="editTimer(${index})" style="background: var(--blue);">Edit</button>
+                        <button class="btn-danger btn-small" onclick="deleteTimer(${index})" style="background: var(--red);">Delete</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function updateTimers() {
+            if (!currentComp) return;
+            renderTimers();
+        }
+
+        function moveTimer(index, direction) {
+            const timers = competitions[currentComp].timers;
+            if (index + direction < 0 || index + direction >= timers.length) return;
+            
+            const temp = timers[index];
+            timers[index] = timers[index + direction];
+            timers[index + direction] = temp;
+            saveData();
+            renderTimers();
+        }
+
+        function openAddTimer() {
+            if (!currentComp) {
+                alert('Please select or create a competition first');
+                return;
+            }
+            
+            if (!competitions[currentComp].startTime) {
+                alert('Note: No competition start time set. Relative timers will use current time as reference.');
+            }
+            
+            document.getElementById('modalTitle').textContent = 'Add Turn-in Timer';
+            document.getElementById('timerForm').reset();
+            document.getElementById('editTimerId').value = '';
+            
+            document.querySelector('input[name="timerType"][value="absolute"]').checked = true;
+            toggleTimerType();
+            
+            const now = new Date();
+            now.setHours(12, 0, 0, 0);
+            document.getElementById('timerTarget').value = toLocalDateTimeInput(now.toISOString());
+            
+            document.getElementById('offsetHours').value = 6;
+            document.getElementById('offsetMinutes').value = 0;
+            document.getElementById('alarmMinutes').value = 15;
+            
+            document.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
+            document.querySelector('.color-option').classList.add('selected');
+            selectedColor = '#b22234';
+            
+            document.getElementById('timerModal').style.display = 'flex';
+        }
+
+        function editTimer(index) {
+            const timer = competitions[currentComp].timers[index];
+            document.getElementById('modalTitle').textContent = 'Edit Turn-in Timer';
+            document.getElementById('editTimerId').value = index;
+            document.getElementById('timerName').value = timer.name;
+            document.getElementById('alarmMinutes').value = timer.alarmMinutes || 15;
+            
+            const isRelative = timer.offsetMinutes !== undefined && competitions[currentComp].startTime;
+            
+            if (isRelative) {
+                document.querySelector('input[name="timerType"][value="relative"]').checked = true;
+                toggleTimerType();
+                const hours = Math.floor(timer.offsetMinutes / 60);
+                const mins = timer.offsetMinutes % 60;
+                document.getElementById('offsetHours').value = hours;
+                document.getElementById('offsetMinutes').value = mins;
+            } else {
+                document.querySelector('input[name="timerType"][value="absolute"]').checked = true;
+                toggleTimerType();
+                document.getElementById('timerTarget').value = toLocalDateTimeInput(timer.target);
+            }
+            
+            document.querySelectorAll('.color-option').forEach(o => {
+                o.classList.toggle('selected', o.dataset.color === (timer.color || '#b22234'));
+                if (o.dataset.color === (timer.color || '#b22234')) selectedColor = timer.color || '#b22234';
+            });
+            
+            document.getElementById('timerModal').style.display = 'flex';
+        }
+
+        function saveTimer(e) {
+            e.preventDefault();
+            const index = document.getElementById('editTimerId').value;
+            const name = document.getElementById('timerName').value.trim();
+            const alarmMinutes = parseInt(document.getElementById('alarmMinutes').value) || 15;
+            const type = document.querySelector('input[name="timerType"]:checked').value;
+            
+            if (!name) {
+                alert('Please enter a category name');
+                return;
+            }
+            
+            let timerData = {
+                name: name,
+                alarmMinutes: alarmMinutes,
+                color: selectedColor
+            };
+            
+            if (type === 'relative') {
+                if (!competitions[currentComp].startTime) {
+                    alert('Competition start time must be set to use relative timers');
+                    return;
+                }
+                const hours = parseInt(document.getElementById('offsetHours').value) || 0;
+                const mins = parseInt(document.getElementById('offsetMinutes').value) || 0;
+                const offsetMinutes = (hours * 60) + mins;
+                const start = new Date(competitions[currentComp].startTime);
+                const target = new Date(start.getTime() + (offsetMinutes * 60000));
+                
+                timerData.target = target.toISOString();
+                timerData.offsetMinutes = offsetMinutes;
+            } else {
+                const target = document.getElementById('timerTarget').value;
+                if (!target) {
+                    alert('Please select a date and time');
+                    return;
+                }
+                timerData.target = new Date(target).toISOString();
+                delete timerData.offsetMinutes;
+            }
+            
+            if (index === '') {
+                competitions[currentComp].timers.push(timerData);
+            } else {
+                competitions[currentComp].timers[parseInt(index)] = timerData;
+            }
+            
+            saveData();
+            closeModal();
+            renderTimers();
+        }
+
+        function deleteTimer(index) {
+            if (!confirm('Delete this timer?')) return;
+            competitions[currentComp].timers.splice(index, 1);
+            saveData();
+            renderTimers();
+        }
+
+        function closeModal() {
+            document.getElementById('timerModal').style.display = 'none';
+        }
+
+        function exportData() {
+            const dataStr = JSON.stringify(competitions, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'patriot-pitmasters-competitions.json';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        function importData() {
+            document.getElementById('importModal').style.display = 'flex';
+            document.getElementById('importData').value = '';
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').style.display = 'none';
+        }
+
+        function processImport(e) {
+            e.preventDefault();
+            try {
+                const data = JSON.parse(document.getElementById('importData').value);
+                if (typeof data !== 'object' || data === null) throw new Error('Invalid format');
+                
+                Object.keys(data).forEach(key => {
+                    if (competitions[key]) {
+                        if (confirm(`Competition "${key}" already exists. Overwrite?`)) {
+                            competitions[key] = data[key];
+                        }
+                    } else {
+                        competitions[key] = data[key];
+                    }
+                });
+                
+                saveData();
+                populateCompetitionSelect();
+                closeImportModal();
+                alert('Import successful!');
+            } catch (err) {
+                alert('Import failed: ' + err.message);
+            }
+        }
+
+        window.onclick = function(e) {
+            if (e.target.classList.contains('modal-overlay')) {
+                e.target.style.display = 'none';
+                if (e.target.id === 'compModal') {
+                    document.getElementById('compName').disabled = false;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
